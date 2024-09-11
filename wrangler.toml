@@ -1,8 +1,8 @@
 #:schema node_modules/wrangler/config-schema.json
 name = "line-beacon-demo"
 main = "src/index.ts"
-compatibility_date = "2024-09-03"
-compatibility_flags = ["nodejs_compat"]
+compatibility_date = "2024-08-21"
+compatibility_flags = ["nodejs_compat_v2"]
 
 # Automatically place your workloads in an optimal location to minimize latency.
 # If you are running back-end logic in a Worker, running it closer to your back-end infrastructure
