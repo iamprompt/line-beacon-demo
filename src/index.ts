@@ -1,5 +1,6 @@
 import { AppError } from './error'
-import { reply, verifyLineSignature } from './line'
+import { beaconHandler, deliveryHandler, followHandler, messageHandler } from './handler'
+import { verifyLineSignature } from './line'
 
 export default {
   async fetch(request, env, ctx): Promise<Response> {
@@ -11,16 +12,20 @@ export default {
       const { body } = await verifyLineSignature(request, env)
 
       for (const event of body.events) {
-        if (!('replyToken' in event)) {
-          continue
+        switch (event.type) {
+          case 'follow':
+            await followHandler(env, event)
+            break
+          case 'message':
+            await messageHandler(env, event)
+            break
+          case 'beacon':
+            await beaconHandler(env, event)
+            break
+          case 'delivery':
+            await deliveryHandler(env, event)
+            break
         }
-
-        await reply(env, event.replyToken, [
-          {
-            type: 'text',
-            text: JSON.stringify(event, null, 2),
-          },
-        ])
       }
 
       return Response.json({ message: 'OK' })
