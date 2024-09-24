@@ -2,10 +2,10 @@ export enum ErrorCode {
   INVALID_SIGNATURE = 'line/invalid-signature',
 }
 
-export const ErrorMessages: Record<
-  ErrorCode,
-  { message: string; status: number }
-> = {
+type ErrorMessagePayload = { message: string; status: number }
+type ErrorMessages = Record<ErrorCode, ErrorMessagePayload>
+
+export const ErrorMessages: ErrorMessages = {
   [ErrorCode.INVALID_SIGNATURE]: {
     message: 'Invalid signature',
     status: 401,

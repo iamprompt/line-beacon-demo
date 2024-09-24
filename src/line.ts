@@ -1,13 +1,12 @@
-import { createHmac } from 'crypto'
-import { WebhookRequestBody, type Message } from '@line/bot-sdk'
+import { createHmac } from 'node:crypto'
+
+import { type Message, WebhookRequestBody } from '@line/bot-sdk'
+
 import { AppError, ErrorCode } from './error'
 
 export const verifyLineSignature = async (request: Request, env: Env) => {
   const body = (await request.json()) as WebhookRequestBody
-  const comparedSignature = createHmac(
-    'SHA256',
-    env.LINE_MESSAGING_API_CHANNEL_SECRET,
-  )
+  const comparedSignature = createHmac('SHA256', env.LINE_MESSAGING_API_CHANNEL_SECRET)
     .update(JSON.stringify(body))
     .digest('base64')
     .toString()
@@ -48,11 +47,7 @@ type SendMessageResponse = {
   }[]
 }
 
-export const reply = async (
-  env: Env,
-  replyToken: string,
-  messages: Message[] = [],
-) => {
+export const reply = async (env: Env, replyToken: string, messages: Message[] = []) => {
   const token = await getStatelessToken(env)
 
   const response = await fetch('https://api.line.me/v2/bot/message/reply', {
