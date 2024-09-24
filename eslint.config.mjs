@@ -28,4 +28,7 @@ export default tseslint.config(
     },
   },
   prettierRecommended,
+  {
+    ignores: ['worker-configuration.d.ts'],
+  },
 )
