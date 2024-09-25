@@ -15,19 +15,20 @@ compatibility_flags = ["nodejs_compat"]
 
 # Bind a D1 database. D1 is Cloudflare’s native serverless SQL database.
 # Docs: https://developers.cloudflare.com/workers/wrangler/configuration/#d1-databases
-# [[d1_databases]]
-# binding = "MY_DB"
-# database_name = "my-database"
-# database_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+[[d1_databases]]
+binding = "db"
+database_name = "iamprompt"
+database_id = "d9fb4b96-e8e8-4295-a131-fa5a08c4d68e"
+migrations_dir = "prisma/migrations"
 
 # Bind a KV Namespace. Use KV as persistent storage for small key-value pairs.
 # Docs: https://developers.cloudflare.com/workers/wrangler/configuration/#kv-namespaces
-# [[kv_namespaces]]
-# binding = "MY_KV_NAMESPACE"
-# id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+[[kv_namespaces]]
+binding = "kv"
+id = "737256a9d0cf41dfa21b21882fe47ec4"
 
 # Bind an R2 Bucket. Use R2 to store arbitrarily large blobs of data, such as files.
 # Docs: https://developers.cloudflare.com/workers/wrangler/configuration/#r2-buckets
 # [[r2_buckets]]
-# binding = "MY_BUCKET"
+# binding = "bucket"
 # bucket_name = "my-bucket"

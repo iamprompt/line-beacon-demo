@@ -2,21 +2,21 @@ import { BeaconEvent, DeliveryEvent, FollowEvent, MessageEvent } from '@line/bot
 
 import { reply } from './line'
 
-export const followHandler = async (env: Env, event: FollowEvent) => {
+export const followHandler = async (event: FollowEvent, env: Env) => {
   await reply(env, event.replyToken, [{ type: 'text', text: JSON.stringify(event, null, 2) }])
   return
 }
 
-export const messageHandler = async (env: Env, event: MessageEvent) => {
+export const messageHandler = async (event: MessageEvent, env: Env) => {
   await reply(env, event.replyToken, [{ type: 'text', text: JSON.stringify(event, null, 2) }])
   return
 }
 
-export const beaconHandler = async (env: Env, event: BeaconEvent) => {
+export const beaconHandler = async (event: BeaconEvent, env: Env) => {
   await reply(env, event.replyToken, [{ type: 'text', text: JSON.stringify(event, null, 2) }])
   return
 }
 
-export const deliveryHandler = async (env: Env, event: DeliveryEvent) => {
+export const deliveryHandler = async (event: DeliveryEvent, env: Env) => {
   return
 }

@@ -21,8 +21,13 @@
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "eslint-plugin-unused-imports": "^4.1.4",
     "prettier": "^3.3.3",
+    "prisma": "^5.20.0",
     "typescript": "^5.6.2",
     "typescript-eslint": "^8.7.0",
     "wrangler": "^3.78.8"
+  },
+  "dependencies": {
+    "@prisma/adapter-d1": "^5.20.0",
+    "@prisma/client": "^5.20.0"
   }
 }

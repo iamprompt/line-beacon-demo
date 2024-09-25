@@ -1,0 +1,32 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int      @id @default(autoincrement())
+  lineUserId    String   @unique @map("line_user_id")
+  displayName   String   @map("display_name")
+  pictureUrl    String   @map("picture_url")
+  statusMessage String?  @map("status_message")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at")
+}
+
+model WebhookEvent {
+  id         Int      @id @default(autoincrement())
+  type       String   @map("type")
+  replyToken String?  @map("reply_token")
+  payload    String   @map("payload")
+  timestamp  DateTime @map("timestamp")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at")
+}

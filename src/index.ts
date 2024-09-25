@@ -1,3 +1,6 @@
+import { PrismaD1 } from '@prisma/adapter-d1'
+import { PrismaClient } from '@prisma/client'
+
 import { AppError } from './error'
 import { beaconHandler, deliveryHandler, followHandler, messageHandler } from './handler'
 import { verifyLineSignature } from './line'
@@ -8,22 +11,34 @@ export default {
       return Response.json({ message: 'Method Not Allowed' }, { status: 405 })
     }
 
+    const adapter = new PrismaD1(env.db)
+    const db = new PrismaClient({ adapter })
+
     try {
       const { body } = await verifyLineSignature(request, env)
 
       for (const event of body.events) {
+        await db.webhookEvent.create({
+          data: {
+            type: event.type,
+            payload: JSON.stringify(event),
+            replyToken: 'replyToken' in event ? event.replyToken : null,
+            timestamp: new Date(event.timestamp),
+          },
+        })
+
         switch (event.type) {
           case 'follow':
-            await followHandler(env, event)
+            await followHandler(event, env)
             break
           case 'message':
-            await messageHandler(env, event)
+            await messageHandler(event, env)
             break
           case 'beacon':
-            await beaconHandler(env, event)
+            await beaconHandler(event, env)
             break
           case 'delivery':
-            await deliveryHandler(env, event)
+            await deliveryHandler(event, env)
             break
         }
       }
