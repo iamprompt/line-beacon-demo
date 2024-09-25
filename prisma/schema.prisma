@@ -19,6 +19,8 @@ model User {
   statusMessage String?  @map("status_message")
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("users")
 }
 
 model WebhookEvent {
@@ -29,4 +31,6 @@ model WebhookEvent {
   timestamp  DateTime @map("timestamp")
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("webhook_events")
 }
