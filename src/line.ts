@@ -25,6 +25,13 @@ type StatelessTokenResponse = {
 }
 
 export const getStatelessToken = async (env: Env) => {
+  const tokenCacheKey = `line:${env.LINE_MESSAGING_API_CHANNEL_ID}:stateless-token`
+
+  const tokenCache = await env.kv.get(tokenCacheKey)
+  if (tokenCache) {
+    return tokenCache
+  }
+
   const token = await fetch('https://api.line.me/oauth2/v3/token', {
     method: 'POST',
     headers: {
@@ -36,6 +43,8 @@ export const getStatelessToken = async (env: Env) => {
       client_secret: env.LINE_MESSAGING_API_CHANNEL_SECRET,
     }),
   }).then((response) => response.json() as Promise<StatelessTokenResponse>)
+
+  await env.kv.put(tokenCacheKey, token.access_token, { expirationTtl: token.expires_in - 60 })
 
   return token.access_token
 }
