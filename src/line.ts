@@ -27,7 +27,6 @@ type StatelessTokenResponse = {
 
 export const getStatelessToken = async (env: Env) => {
   const tokenCacheKey = `line:${env.LINE_MESSAGING_API_CHANNEL_ID}:stateless-token`
-
   const tokenCache = await env.kv.get(tokenCacheKey)
   if (tokenCache) {
     return tokenCache
@@ -68,6 +67,8 @@ export const reply = async (env: Env, replyToken: string, messages: Message[] = 
     },
     body: JSON.stringify({ replyToken, messages }),
   }).then((response) => response.json() as Promise<SendMessageResponse>)
+
+  console.log(response)
 
   return response
 }
