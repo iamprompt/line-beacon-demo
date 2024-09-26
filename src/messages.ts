@@ -134,3 +134,23 @@ export const BeaconEnterMessage = (params: BeaconEnterMessageParams = {}): Messa
     },
   },
 })
+
+export const InEventMessages = (text: string): Message[] => {
+  switch (text) {
+    case 'ห้องน้ำ':
+      return [{ type: 'text', text: 'ห้องน้ำอยู่ด้านหลังของอาคารครับ' }]
+    case 'ที่จอดรถ':
+      return [{ type: 'text', text: 'ที่จอดรถอยู่ด้านหน้าของอาคารครับ' }]
+    default:
+      return []
+  }
+}
+
+export const AutoMessages = (text: string): Message[] => {
+  switch (text) {
+    case 'ห้องน้ำ':
+      return [{ type: 'text', text: 'ฉันไม่รู้คุณอยู่ที่ไหน' }]
+    default:
+      return []
+  }
+}

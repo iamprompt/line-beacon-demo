@@ -1,7 +1,8 @@
 import { BeaconEvent, DeliveryEvent, FollowEvent, MessageEvent } from '@line/bot-sdk'
 
+import { beaconSessionCacheKey } from './constants'
 import { getProfile, reply } from './line'
-import { BeaconEnterMessage, GreetingMessage } from './messages'
+import { AutoMessages, BeaconEnterMessage, GreetingMessage, InEventMessages } from './messages'
 import { Prisma } from './type'
 
 export const followHandler = async (event: FollowEvent, env: Env, db: Prisma) => {
@@ -22,24 +23,39 @@ export const followHandler = async (event: FollowEvent, env: Env, db: Prisma) =>
 }
 
 export const messageHandler = async (event: MessageEvent, env: Env, db: Prisma) => {
-  await reply(env, event.replyToken, [{ type: 'text', text: JSON.stringify(event, null, 2) }])
+  if (event.message.type !== 'text') {
+    return
+  }
+
+  if (event.source.type !== 'user') {
+    return
+  }
+
+  const text = event.message.text
+
+  const isInBeaconSessionCache = await env.kv.get(beaconSessionCacheKey(event.source.userId))
+  const isInBeaconSession = isInBeaconSessionCache && isInBeaconSessionCache === 'true'
+
+  const replyMessages = isInBeaconSession ? InEventMessages(text) : AutoMessages(text)
+  if (replyMessages.length === 0) {
+    return
+  }
+
+  await reply(env, event.replyToken, replyMessages)
   return
 }
 
 export const beaconHandler = async (event: BeaconEvent, env: Env, db: Prisma) => {
-  const latestBeaconEvent = await db.webhookEvent.findFirst({
-    where: {
-      type: 'beacon',
-      webhookEventId: { not: event.webhookEventId },
-      timestamp: { gt: new Date(Date.now() - 1000 * 60 * 60 * 24) },
-    },
-    orderBy: { timestamp: 'desc' },
-  })
-
-  if (latestBeaconEvent) {
+  if (event.source.type !== 'user') {
     return
   }
 
+  const isInBeaconSession = await env.kv.get(beaconSessionCacheKey(event.source.userId))
+  if (isInBeaconSession && isInBeaconSession === 'true') {
+    return
+  }
+
+  await env.kv.put(beaconSessionCacheKey(event.source.userId), 'true', { expirationTtl: 60 * 60 })
   await reply(env, event.replyToken, [BeaconEnterMessage()])
   return
 }
