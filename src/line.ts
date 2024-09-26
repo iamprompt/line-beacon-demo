@@ -1,8 +1,9 @@
 import { createHmac } from 'node:crypto'
 
-import { type Message, WebhookRequestBody } from '@line/bot-sdk'
+import { type Message, Profile, WebhookRequestBody } from '@line/bot-sdk'
 
 import { AppError, ErrorCode } from './error'
+import { Prisma } from './type'
 
 export const verifyLineSignature = async (request: Request, env: Env) => {
   const body = (await request.json()) as WebhookRequestBody
@@ -69,4 +70,29 @@ export const reply = async (env: Env, replyToken: string, messages: Message[] = 
   }).then((response) => response.json() as Promise<SendMessageResponse>)
 
   return response
+}
+
+export const getProfile = async (env: Env, userId: string, db?: Prisma) => {
+  const token = await getStatelessToken(env)
+
+  const profile = await fetch(`https://api.line.me/v2/bot/profile/${userId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }).then((response) => response.json() as Promise<Profile>)
+
+  if (db) {
+    await db.user.upsert({
+      where: { lineUserId: userId },
+      update: { displayName: profile.displayName },
+      create: {
+        lineUserId: userId,
+        displayName: profile.displayName,
+        pictureUrl: profile.pictureUrl ?? '',
+        statusMessage: profile.statusMessage ?? '',
+      },
+    })
+  }
+
+  return profile
 }

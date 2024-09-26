@@ -24,13 +24,14 @@ model User {
 }
 
 model WebhookEvent {
-  id         Int      @id @default(autoincrement())
-  type       String   @map("type")
-  replyToken String?  @map("reply_token")
-  payload    String   @map("payload")
-  timestamp  DateTime @map("timestamp")
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at")
+  id             Int      @id @default(autoincrement())
+  type           String   @map("type")
+  webhookEventId String?  @unique @map("webhook_event_id")
+  replyToken     String?  @map("reply_token")
+  payload        String   @map("payload")
+  timestamp      DateTime @map("timestamp")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@map("webhook_events")
 }

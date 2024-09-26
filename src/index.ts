@@ -21,6 +21,7 @@ export default {
         await db.webhookEvent.create({
           data: {
             type: event.type,
+            webhookEventId: event.webhookEventId,
             payload: JSON.stringify(event),
             replyToken: 'replyToken' in event ? event.replyToken : null,
             timestamp: new Date(event.timestamp),
@@ -29,16 +30,16 @@ export default {
 
         switch (event.type) {
           case 'follow':
-            await followHandler(event, env)
+            await followHandler(event, env, db)
             break
           case 'message':
-            await messageHandler(event, env)
+            await messageHandler(event, env, db)
             break
           case 'beacon':
-            await beaconHandler(event, env)
+            await beaconHandler(event, env, db)
             break
           case 'delivery':
-            await deliveryHandler(event, env)
+            await deliveryHandler(event, env, db)
             break
         }
       }
