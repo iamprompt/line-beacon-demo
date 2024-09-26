@@ -72,6 +72,19 @@ export const reply = async (env: Env, replyToken: string, messages: Message[] = 
   return response
 }
 
+export const setRichMenu = async (env: Env, userId: string, richMenuId: string) => {
+  if (!richMenuId) {
+    return
+  }
+
+  const token = await getStatelessToken(env)
+
+  await fetch(`https://api.line.me/v2/bot/user/${userId}/richmenu/${richMenuId}`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+  })
+}
+
 export const getProfile = async (env: Env, userId: string, db?: Prisma) => {
   const token = await getStatelessToken(env)
 
