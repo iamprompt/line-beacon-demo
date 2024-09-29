@@ -2,8 +2,9 @@ import { PrismaD1 } from '@prisma/adapter-d1'
 import { PrismaClient } from '@prisma/client'
 
 import { AppError } from './error'
-import { beaconHandler, deliveryHandler, followHandler, messageHandler } from './handler'
+import { beaconHandler, followHandler, messageHandler } from './handler'
 import { verifyLineSignature } from './line'
+import { logEventToDb } from './utils'
 
 export default {
   async fetch(request, env, ctx): Promise<Response> {
@@ -18,15 +19,7 @@ export default {
       const { body } = await verifyLineSignature(request, env)
 
       for (const event of body.events) {
-        await db.webhookEvent.create({
-          data: {
-            type: event.type,
-            webhookEventId: event.webhookEventId,
-            payload: JSON.stringify(event),
-            replyToken: 'replyToken' in event ? event.replyToken : null,
-            timestamp: new Date(event.timestamp),
-          },
-        })
+        await logEventToDb(db, event)
 
         switch (event.type) {
           case 'follow':
@@ -37,9 +30,6 @@ export default {
             break
           case 'beacon':
             await beaconHandler(event, env, db)
-            break
-          case 'delivery':
-            await deliveryHandler(event, env, db)
             break
         }
       }

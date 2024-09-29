@@ -1,19 +1,17 @@
-import { BeaconEvent, DeliveryEvent, FollowEvent, MessageEvent } from '@line/bot-sdk'
+import { BeaconEvent, FollowEvent, MessageEvent } from '@line/bot-sdk'
 
-import { beaconSessionCacheKey } from './constants'
 import { getProfile, reply } from './line'
 import { AutoMessages, BeaconEnterMessage, GreetingMessage, InEventMessages } from './messages'
 import { Prisma } from './type'
+import { getBeaconSessionCache, setBeaconSessionCache } from './utils'
 
 export const followHandler = async (event: FollowEvent, env: Env, db: Prisma) => {
   const { userId } = event.source
-
   if (!userId) {
     return
   }
 
   const profile = await getProfile(env, userId, db)
-
   if (!profile) {
     return
   }
@@ -33,7 +31,7 @@ export const messageHandler = async (event: MessageEvent, env: Env, db: Prisma) 
 
   const text = event.message.text
 
-  const isInBeaconSessionCache = await env.kv.get(beaconSessionCacheKey(event.source.userId))
+  const isInBeaconSessionCache = await getBeaconSessionCache(env, event.source.userId)
   const isInBeaconSession = isInBeaconSessionCache && isInBeaconSessionCache === 'true'
 
   const replyMessages = isInBeaconSession ? InEventMessages(text) : AutoMessages(text)
@@ -50,16 +48,12 @@ export const beaconHandler = async (event: BeaconEvent, env: Env, db: Prisma) =>
     return
   }
 
-  const isInBeaconSession = await env.kv.get(beaconSessionCacheKey(event.source.userId))
+  const isInBeaconSession = await getBeaconSessionCache(env, event.source.userId)
   if (isInBeaconSession && isInBeaconSession === 'true') {
     return
   }
 
-  await env.kv.put(beaconSessionCacheKey(event.source.userId), 'true', { expirationTtl: 60 * 60 })
+  await setBeaconSessionCache(env, event.source.userId)
   await reply(env, event.replyToken, [BeaconEnterMessage()])
-  return
-}
-
-export const deliveryHandler = async (event: DeliveryEvent, env: Env, db: Prisma) => {
   return
 }
